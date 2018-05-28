@@ -1,14 +1,15 @@
 import re
 
 class Node(object):
-    def __init__(self, data=None):
+    def __init__(self, data=None,parent=None):
         self.data = data
         self.mapFolder = "maps/"
         self.children = []
+        self.parent = parent
 
     def __eq__(self,other):
         if isinstance(self,other.__class__):
-            return self.__dict__ == other.__dict__
+            return self.data == other.data
         return False
     def __hash__(self):
         try:
@@ -18,7 +19,9 @@ class Node(object):
 
 
     def AddChild(self, obj):
+        obj.parent=self
         self.children.append(obj)
+
 
 
 
@@ -105,6 +108,29 @@ class Node(object):
 
         if((point[1]-1)>=0):
             if(not Table[point[0]][point[1]-1]=='%'):
+                points[3] = Node([point[0],point[1]-1])
+
+        return points
+    def ClosebyDataPointsN(self,point,Table,visited):
+        point = point.data
+        rows,columns = len(Table),len(Table[1])
+
+        points = {}
+
+        if((point[0]+1)<rows):
+            if(not Table[point[0]+1][point[1]]=='%' and not Node([point[0]+1,point[1]]) in visited):
+                points[0] = Node([point[0]+1,point[1]])
+
+        if((point[1]+1)<columns):
+            if(not Table[point[0]][point[1]+1]=='%'  and not Node([point[0],point[1]+1]) in visited):
+                points[1] = Node([point[0],point[1]+1])
+
+        if((point[0]-1)>=0):
+            if(not Table[point[0]-1][point[1]]=='%'  and not Node([point[0]-1,point[1]]) in visited):
+                points[2] = Node([point[0]-1,point[1]])
+
+        if((point[1]-1)>=0):
+            if(not Table[point[0]][point[1]-1]=='%'  and not Node([point[0]+1,point[1]]) in visited):
                 points[3] = Node([point[0],point[1]-1])
 
         return points
