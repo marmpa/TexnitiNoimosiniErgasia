@@ -135,6 +135,12 @@ class Node(object):
 
         return points
 
+    def ListToNodeList(self,list):
+        a = []
+        for x in list:
+            a.append(Node(x))
+        return a
+
 
 
 #kato deksia pano aristera

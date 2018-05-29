@@ -2,6 +2,8 @@ from Tree import Node
 from queue import Queue
 import re
 
+from pptree import print_tree
+
 marios = Node(5)
 marios.AddChild(marios)
 
@@ -13,8 +15,27 @@ marios.ProcessMap(fileName)
 a = {Node([2,5]),Node([2,3])}
 
 print(Node([2,1]) in a)
+dataTable,mapPoints = marios.CreateMapDataTable(fileName)
 
 #print(Node(2) in a.queue())
+def PrintNode(node):
+    #print(node)
+    try:
+        for x in node:
+            print(x.data)
+    except Exception:
+        for x in node:
+            print(x)
+def SetToList(oSet):
+    a = []
+    for x in oSet:
+        a.append(x)
+    return a
+def NodeToList(oSet):
+    a=[]
+    for x in oSet:
+        a.append(x.data)
+    return a
 
 def RemoveDictonaryKey(d, key):
     r = dict(d)
@@ -112,9 +133,9 @@ def BreadthFirstSearch():
             #t = CreatePath(subRoot,meta,Node(goal))
             #t.append(goal);
             #marios.PrintFinishedMap(dataTable,t)
-            PrintTreeView(root)
+            #PrintTreeView(root)
             #return t
-            return True
+            return visitedNodes
 
         #print("fores",subRoot.data)
         for (action,child) in marios.ClosebyDataPoints(subRoot,dataTable).items():
@@ -134,6 +155,7 @@ def BreadthFirstSearch():
                     metaNodes.add(child)
 
 
+
                 #metaNodes.add(child)
 
                 #print("    child",child.data,"parent",subRoot.data,"yahoo")
@@ -142,5 +164,50 @@ def BreadthFirstSearch():
                 openSetCopy[child]=child
         visitedNodes.add(subRoot)
         #meta = subRoot
+def DepthFirstSearch():
+    dataTable,mapPoints = marios.CreateMapDataTable(fileName)
 
-print(BreadthFirstSearch(),'yes')
+    openSet = []
+    visitedNodes = set()
+    metaNodes = set()
+
+    root,goal = Node(mapPoints['p']),mapPoints['g']
+
+
+
+    openSet.append(root)
+    metaNodes.add(root)
+
+    while openSet:
+        subRoot = openSet.pop()
+        meta = subRoot
+
+        if(subRoot.data==goal):
+            t= FindPath(meta,root)
+            print("Lisi Depth First!")
+            marios.PrintFinishedMap(dataTable,t)
+            return visitedNodes
+        for (action,child) in marios.ClosebyDataPoints(subRoot,dataTable).items():
+            if(child in visitedNodes):
+                continue
+
+            if(child not in openSet):
+                    openSet.append(child)
+                    meta.AddChild(child)
+        visitedNodes.add(subRoot)
+
+    return visitedNodes
+
+
+m = DepthFirstSearch()
+n = BreadthFirstSearch()
+a=SetToList(m)
+a=NodeToList(a)
+b=SetToList(n)
+b=NodeToList(b)
+print()
+print("Ta visited","#"*len(dataTable))
+print()
+marios.PrintFinishedMap(dataTable,a)
+print()
+marios.PrintFinishedMap(dataTable,b)
