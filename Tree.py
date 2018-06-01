@@ -11,6 +11,10 @@ class Node(object):
         if isinstance(self,other.__class__):
             return self.data == other.data
         return False
+    def __lt__(self,other):
+        if isinstance(self,other.__class__):
+            return self.data < other.data
+        return False
     def __hash__(self):
         try:
             return hash(tuple(self.data))
@@ -22,6 +26,18 @@ class Node(object):
         obj.parent=self
         self.children.append(obj)
 
+    def AddChildOnce(self,obj):
+        obj.parent=self
+        if(obj not in self.children):
+            self.children.append(obj)
+        else:
+            print("geia")
+
+    def AddParent(self,obj):
+        obj.AddChildOnce(self)
+
+    def AddParentOnly(self,obj):
+        self.parent=obj
 
 
 
@@ -112,7 +128,7 @@ class Node(object):
 
         return points
     def ManhattanPointDistance(self,nodePoint,goal):
-        return abs(nodePoint.data[0] - goal[0]) + abs(nodePoint.data[1] - goal[1]);
+        return (abs(nodePoint.data[0] - goal[0]) + abs(nodePoint.data[1] - goal[1]));
     def ClosebyDataPointsN(self,point,Table,visited):
         point = point.data
         rows,columns = len(Table),len(Table[1])

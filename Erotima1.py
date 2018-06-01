@@ -3,6 +3,7 @@ from queue import Queue
 from queue import PriorityQueue
 import re
 import itertools
+from heapq import heappop, heappush
 
 from pptree import print_tree
 
@@ -18,6 +19,18 @@ a = {Node([2,5]),Node([2,3])}
 
 print(Node([2,1]) in a)
 dataTable,mapPoints = marios.CreateMapDataTable(fileName)
+
+def Finddubl(node,a=None,num=0):
+    if a is None:
+        a = set()
+        a.add(node)
+    if node:
+        for x in node.children:
+            if(x in a):
+                print("Diplotipo to " ,x.data," riza ", num)
+            a.add(x)
+            Finddubl(x,a,num+1)
+
 
 def PrintFatherOfFather(node):
 
@@ -43,6 +56,10 @@ def NodeToList(oSet):
     for x in oSet:
         a.append(x.data)
     return a
+
+def VisitedNodesToDataForDisplaying(oSet):
+    tx = SetToList(oSet)
+    return NodeToList(tx)
 
 def RemoveDictonaryKey(d, key):
     r = dict(d)
@@ -72,8 +89,6 @@ def PrintSubRoot(subRoot,num=0):
     else:
         print("Parent",subRoot.data)
 def FindPath(meta,start):
-    print("Inside create path2")
-
     actionList = list()
 
     while meta is not None:
@@ -127,21 +142,10 @@ def BreadthFirstSearch():
         openSetCopy = RemoveDictonaryKey(openSetCopy,subRoot)
 
         if(subRoot.data==goal):
-            #return CreatePath()
-            #print(mapPoints['g'],"yolo")
-            #print(goal,"patatatata")
-            #print(root.data)
-            #print(goal)
-            #meta.AddChild(subRoot)
+
             t = FindPath(meta,root)
             print("Lisi Breadth First!")
             marios.PrintFinishedMap(dataTable,t)
-            #PrintSubRoot(head)
-            #t = CreatePath(subRoot,meta,Node(goal))
-            #t.append(goal);
-            #marios.PrintFinishedMap(dataTable,t)
-            #PrintTreeView(root)
-            #return t
             return visitedNodes
 
         #print("fores",subRoot.data)
@@ -155,17 +159,8 @@ def BreadthFirstSearch():
 
 
                 if(child not in metaNodes):
-                    #for i in metaNodes:
-                        #print(i.data,"visited","child",child.data)
-                    #print("parent:",subRoot.data,"child:",child.data)
                     meta.AddChild(child)
                     metaNodes.add(child)
-
-
-
-                #metaNodes.add(child)
-
-                #print("    child",child.data,"parent",subRoot.data,"yahoo")
 
                 openSet.put(child)
                 openSetCopy[child]=child
@@ -207,45 +202,55 @@ def DepthFirstSearch():
 
 #temporary
 goal = mapPoints['g']
-def DepthFirstSearchRecurs(subRoot=None,visitedNodes=None,meta=None,metaNodes=None,itter=1):
-    if visitedNodes is None:
-        visitedNodes = set()
+def CallDepthFirstSearchRecurs():
+    dataTable,mapPoints = marios.CreateMapDataTable(fileName)
+    root,goal = Node(mapPoints['p']),mapPoints['g']
 
-    if metaNodes is None:
-        metaNodes=set()
-    if subRoot is None:
-        subRoot=Node(mapPoints['p'])
-        meta=subRoot
-    else:
-        if meta is None:
+
+    def DepthFirstSearchRecurs(subRoot=None,visitedNodes=None,meta=None,metaNodes=None,itter=1):
+        if visitedNodes is None:
+            visitedNodes = set()
+
+        if metaNodes is None:
+            metaNodes=set()
+        if subRoot is None:
+            subRoot=Node(mapPoints['p'])
             meta=subRoot
         else:
-            pass
+            if meta is None:
+                meta=subRoot
+            else:
+                pass
 
-    visitedNodes.add(subRoot)
-    meta=subRoot
+        visitedNodes.add(subRoot)
+        meta=subRoot
 
-    if(subRoot.data==goal):
-        return subRoot
+        if(subRoot.data==goal):
+            return subRoot
 
-    for(action,child) in marios.ClosebyDataPoints(subRoot,dataTable).items():
-        if(child not in visitedNodes):
-            t = visitedNodes.copy()
-            if(child not in metaNodes):
-                #print(child.data,"child.data")
-                metaNodes.add(child)
-                meta.AddChild(child)
-            if(itter!=1):
-                ans = DepthFirstSearchRecurs(child,visitedNodes,meta,metaNodes,itter+1)
-                if((not type(ans)==tuple)and(ans is not None)):
-                    return ans
-            elif(itter==1):
-                ans = DepthFirstSearchRecurs(child,visitedNodes,meta,metaNodes,itter+1)
-                if((not type(ans)==tuple)and(ans is not None)):
-                    return visitedNodes,ans,meta
+        for(action,child) in marios.ClosebyDataPoints(subRoot,dataTable).items():
+            if(child not in visitedNodes):
+                t = visitedNodes.copy()
+                if(child not in metaNodes):
+                    #print(child.data,"child.data")
+                    metaNodes.add(child)
+                    meta.AddChild(child)
+                if(itter!=1):
+                    ans = DepthFirstSearchRecurs(child,visitedNodes,meta,metaNodes,itter+1)
+                    if((not type(ans)==tuple)and(ans is not None)):
+                        return ans
+                elif(itter==1):
+                    ans = DepthFirstSearchRecurs(child,visitedNodes,meta,metaNodes,itter+1)
+                    if((not type(ans)==tuple)and(ans is not None)):
+                        return visitedNodes,ans,meta
 
-    #print(itter)
-    return None
+        #print(itter)
+        return None
+
+        ty,tx,tz = DepthFirstSearchRecurs()
+        trx = FindPath(tx,tz)
+        print("Lisi Depth First Search!")
+        marios.PrintFinishedMap(dataTable,trx)
 
 def IterativeDeepening():
 
@@ -295,6 +300,10 @@ def IterativeDeepening():
         answer=DepthFirstIterativeDeepeningSearch(depth=depth)
 
         if(answer is not None):
+            ty,tx,tz = IterativeDeepening()
+            trx = FindPath(tx,tz)
+            print("Lisi Iterative Deepening First!")
+            marios.PrintFinishedMap(dataTable,trx)
             return answer[0],answer[1],answer[2]
 
 
@@ -302,8 +311,88 @@ def BestFirstSearch():
     dataTable,mapPoints = marios.CreateMapDataTable(fileName)
     root,goal = Node(mapPoints['p']),mapPoints['g']
 
+    searchPriorityQueue = PriorityQueue()
+    visitedNodes = set()
+    metaNodes = set()
+
+    searchPriorityQueue.put([0,root])
+    visitedNodes.add(root)
+
+    while not searchPriorityQueue.empty():
+        subRoot = searchPriorityQueue.get()[1]
+
+        if(subRoot not in metaNodes):
+            metaNodes.add(subRoot)
+            if subRoot.parent is not None:
+                meta = subRoot.parent
+                meta.AddChildOnce(subRoot)
+
+        if(subRoot.data == goal):
+            t=FindPath(meta,root)
+            print("Best First Search")
+            marios.PrintFinishedMap(dataTable,t)
+            Finddubl(root)
+            return visitedNodes
+        else:
+            for(action,child) in marios.ClosebyDataPoints(subRoot,dataTable).items():
+                if(child not in visitedNodes):
+                    #exei lathos bazo panta to addchild gia kathe paidi
+                    if(child.parent is None):
+                        child.AddParentOnly(subRoot)
+                    visitedNodes.add(child)
+                    #t = VisitedNodesToDataForDisplaying(visitedNodes)
+                    #marios.PrintFinishedMap(dataTable,t)
+                    #print(child.data,"Apostasi:",marios.ManhattanPointDistance(child,goal),end="")
+                    searchPriorityQueue.put([marios.ManhattanPointDistance(child,goal),child])
 
 
+
+def AStartSearch():
+    dataTable,mapPoints = marios.CreateMapDataTable(fileName)
+    root,goal = Node(mapPoints['p']),mapPoints['g']
+
+    searchPriorityQueue = []
+    visitedNodes = set()
+    metaNodes = set()
+
+    heappush(searchPriorityQueue,[0+marios.ManhattanPointDistance(root,goal),0,root])
+
+    while searchPriorityQueue:
+        _, cost,subRoot = heappop(searchPriorityQueue)
+
+        if(subRoot not in metaNodes):
+            metaNodes.add(subRoot)
+
+            if subRoot.parent is not None:
+                meta = subRoot.parent
+                meta.AddChildOnce(subRoot)
+
+
+        if(subRoot.data == goal):
+            t = FindPath(meta,root)
+            print("Best First Search")
+            marios.PrintFinishedMap(dataTable,t)
+            return visitedNodes
+        if subRoot in visitedNodes:
+            continue
+        visitedNodes.add(subRoot)
+        #t = VisitedNodesToDataForDisplaying(visitedNodes)
+        #marios.PrintFinishedMap(dataTable,t)
+
+
+        for(action,child) in marios.ClosebyDataPoints(subRoot,dataTable).items():
+            if(child not in searchPriorityQueue):
+                if(child.parent is None):
+                    child.AddParentOnly(subRoot)
+                heappush(searchPriorityQueue,[cost + marios.ManhattanPointDistance(root,goal),cost + 1,child])
+
+root=Node(mapPoints['p'])
+ans = AStartSearch()
+print()
+t = VisitedNodesToDataForDisplaying(ans)
+marios.PrintFinishedMap(dataTable,t)
+BestFirstSearch()
+"""
 ty,tx,tz = IterativeDeepening()
 trx = FindPath(tx,tz)
 print("Lisi IterativeDeepening First!")
@@ -320,7 +409,7 @@ print("Lisi DepthFirstSearch First!")
 marios.PrintFinishedMap(dataTable,trx)
 #print()
 
-
+"""
 """
 m = DepthFirstSearch()
 n = BreadthFirstSearch()

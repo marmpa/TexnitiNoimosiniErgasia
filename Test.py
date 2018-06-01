@@ -15,7 +15,7 @@ a = {Node([2,5]),Node([2,3])}
 print(Node([2,1]) in a)
 
 #print(Node(2) in a.queue())
-
+#με λένε μάριος
 def RemoveDictonaryKey(d, key):
     r = dict(d)
     del r[key]
