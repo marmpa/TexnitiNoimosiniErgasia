@@ -77,15 +77,11 @@ def PrintTreeView(Tree,depth=0):
     return 1*depth
 
 def PrintSubRoot(subRoot,num=0):
-    #print("hello",num)
     if subRoot:
 
         for x in subRoot.children:
-            #print("geia")
             PrintSubRoot(x,num+1)
             print("  Child",x.data,"gaol",num,"Parent",subRoot.data)
-            #for y in x.children:
-            #    print("   ",y.data,"gaol")
     else:
         print("Parent",subRoot.data)
 def FindPath(meta,start):
@@ -99,27 +95,11 @@ def FindPath(meta,start):
     print("steps:",len(actionList))
     return actionList
 
-
-def CreatePath(state,meta,goal):
-    print("Inside create path")
-    #print(meta)
-    actionList = list()
-
-    while meta[state] is not None:
-        #print(state.data,meta[state].data)
-        state = meta[state]
-        actionList.append(state.data)
-
-    actionList.reverse()
-    return actionList
-
 def BreadthFirstSearch():
     dataTable,mapPoints = marios.CreateMapDataTable(fileName)
 
-
     openSet = Queue()
     openSetCopy = {}
-
 
     visitedNodes = set()
     metaNodes = set()
@@ -150,14 +130,10 @@ def BreadthFirstSearch():
 
         #print("fores",subRoot.data)
         for (action,child) in marios.ClosebyDataPoints(subRoot,dataTable).items():
-
-            #print(action,child.data,"terastiaabga",len(marios.ClosebyDataPoints(subRoot,dataTable).items()))
             if(child in visitedNodes):
                 continue
 
             if(child not in openSetCopy):
-
-
                 if(child not in metaNodes):
                     meta.AddChild(child)
                     metaNodes.add(child)
@@ -165,7 +141,7 @@ def BreadthFirstSearch():
                 openSet.put(child)
                 openSetCopy[child]=child
         visitedNodes.add(subRoot)
-        #meta = subRoot
+
 def DepthFirstSearch():
     dataTable,mapPoints = marios.CreateMapDataTable(fileName)
 
@@ -174,8 +150,6 @@ def DepthFirstSearch():
     metaNodes = set()
 
     root,goal = Node(mapPoints['p']),mapPoints['g']
-
-
 
     openSet.append(root)
     metaNodes.add(root)
@@ -244,13 +218,14 @@ def CallDepthFirstSearchRecurs():
                     if((not type(ans)==tuple)and(ans is not None)):
                         return visitedNodes,ans,meta
 
-        #print(itter)
         return None
 
-        ty,tx,tz = DepthFirstSearchRecurs()
-        trx = FindPath(tx,tz)
-        print("Lisi Depth First Search!")
-        marios.PrintFinishedMap(dataTable,trx)
+    print("ya")
+    ty,tx,tz = DepthFirstSearchRecurs()
+    print_tree(tz,nameattr='data')
+    trx = FindPath(tx,tz)
+    print("Lisi Depth First Search!")
+    marios.PrintFinishedMap(dataTable,trx)
 
 def IterativeDeepening():
 
@@ -300,7 +275,7 @@ def IterativeDeepening():
         answer=DepthFirstIterativeDeepeningSearch(depth=depth)
 
         if(answer is not None):
-            ty,tx,tz = IterativeDeepening()
+            ty,tx,tz = answer
             trx = FindPath(tx,tz)
             print("Lisi Iterative Deepening First!")
             marios.PrintFinishedMap(dataTable,trx)
@@ -370,8 +345,9 @@ def AStartSearch():
 
         if(subRoot.data == goal):
             t = FindPath(meta,root)
-            print("Best First Search")
+            print("A Star Search")
             marios.PrintFinishedMap(dataTable,t)
+            print_tree(root,nameattr='data')
             return visitedNodes
         if subRoot in visitedNodes:
             continue
@@ -385,13 +361,17 @@ def AStartSearch():
                 if(child.parent is None):
                     child.AddParentOnly(subRoot)
                 heappush(searchPriorityQueue,[cost + marios.ManhattanPointDistance(root,goal),cost + 1,child])
-
-root=Node(mapPoints['p'])
-ans = AStartSearch()
-print()
-t = VisitedNodesToDataForDisplaying(ans)
-marios.PrintFinishedMap(dataTable,t)
+BreadthFirstSearch()
+CallDepthFirstSearchRecurs()
+IterativeDeepening()
 BestFirstSearch()
+AStartSearch()
+#root=Node(mapPoints['p'])
+#ans = AStartSearch()
+#print()
+#t = VisitedNodesToDataForDisplaying(ans)
+#marios.PrintFinishedMap(dataTable,t)
+#BestFirstSearch()
 """
 ty,tx,tz = IterativeDeepening()
 trx = FindPath(tx,tz)
