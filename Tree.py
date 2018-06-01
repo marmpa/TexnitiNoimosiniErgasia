@@ -111,6 +111,8 @@ class Node(object):
                 points[3] = Node([point[0],point[1]-1])
 
         return points
+    def ManhattanPointDistance(self,nodePoint,goal):
+        return abs(nodePoint.data[0] - goal[0]) + abs(nodePoint.data[1] - goal[1]);
     def ClosebyDataPointsN(self,point,Table,visited):
         point = point.data
         rows,columns = len(Table),len(Table[1])
